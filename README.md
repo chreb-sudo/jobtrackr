@@ -1,5 +1,7 @@
 # JobTrackr
 
+[![CI](https://github.com/chreb-sudo/jobtrackr/actions/workflows/ci.yml/badge.svg)](https://github.com/chreb-sudo/jobtrackr/actions/workflows/ci.yml)
+
 A job-application tracker with a drag-and-drop Kanban board.
 
 - **Frontend** — React 18 + Vite + TypeScript
