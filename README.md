@@ -7,6 +7,8 @@ A job-application tracker with a drag-and-drop Kanban board.
 - **Tests** — Vitest + supertest against the real API and a throwaway SQLite database
 - **CI** — GitHub Actions runs lint, typecheck, tests and build on every pull request
 
+![The JobTrackr board](docs/screenshots/board.png)
+
 Applications move through five stages: **Applied → Phone → Onsite → Offer → Rejected**. Cards are
 dragged between columns and every change is persisted through the API.
 
