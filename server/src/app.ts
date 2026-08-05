@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import type { PrismaClient } from '@prisma/client';
 import { jobsRouter } from './jobs.js';
+import { remindersRouter } from './reminders.js';
 import { STATUSES } from './status.js';
 
 export function createApp(prisma: PrismaClient) {
@@ -11,6 +12,7 @@ export function createApp(prisma: PrismaClient) {
 
   app.get('/api/health', (_req, res) => res.json({ ok: true, statuses: STATUSES }));
   app.use('/api/jobs', jobsRouter(prisma));
+  app.use('/api/reminders', remindersRouter(prisma));
 
   return app;
 }

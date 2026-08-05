@@ -14,7 +14,10 @@ const emptyInput = (status: Status): JobInput => ({
   link: '',
   notes: '',
   status,
+  followUpDate: '',
 });
+
+const toDateInput = (value: string | null) => (value ? value.slice(0, 10) : '');
 
 export function JobDialog({ job, initialStatus, onClose, onSubmit }: Props) {
   const [input, setInput] = useState<JobInput>(emptyInput(initialStatus));
@@ -30,6 +33,7 @@ export function JobDialog({ job, initialStatus, onClose, onSubmit }: Props) {
             link: job.link ?? '',
             notes: job.notes ?? '',
             status: job.status,
+            followUpDate: toDateInput(job.followUpDate),
           }
         : emptyInput(initialStatus),
     );
@@ -97,6 +101,15 @@ export function JobDialog({ job, initialStatus, onClose, onSubmit }: Props) {
               </option>
             ))}
           </select>
+        </label>
+
+        <label>
+          Follow-up date
+          <input
+            type="date"
+            value={input.followUpDate}
+            onChange={(e) => set('followUpDate', e.target.value)}
+          />
         </label>
 
         <label>

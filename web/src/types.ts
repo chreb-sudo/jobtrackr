@@ -10,6 +10,7 @@ export interface Job {
   notes: string | null;
   status: Status;
   order: number;
+  followUpDate: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,4 +21,10 @@ export interface JobInput {
   link: string;
   notes: string;
   status: Status;
+  followUpDate: string;
+}
+
+export interface Reminders {
+  days: number;
+  jobs: Job[];
 }

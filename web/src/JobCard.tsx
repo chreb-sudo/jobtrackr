@@ -1,3 +1,4 @@
+import { formatFollowUp, isOverdue } from './reminders';
 import type { Job } from './types';
 
 interface Props {
@@ -34,6 +35,11 @@ export function JobCard({ job, onEdit, onDelete, onDragStart, onDragEnd, draggin
         </div>
       </header>
       <p className="role">{job.role}</p>
+      {job.followUpDate && (
+        <p className={`follow-up${isOverdue(job.followUpDate) ? ' follow-up-overdue' : ''}`}>
+          Follow up {formatFollowUp(job.followUpDate)}
+        </p>
+      )}
       {job.notes && <p className="notes">{job.notes}</p>}
       {job.link && (
         <a href={job.link} target="_blank" rel="noreferrer" className="link">
