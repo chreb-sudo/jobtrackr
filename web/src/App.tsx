@@ -1,29 +1,36 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createJob, deleteJob, listJobs, updateJob } from './api';
+import { createJob, deleteJob, listJobs, listReminders, updateJob } from './api';
+import { DueSoon } from './DueSoon';
 import { JobCard } from './JobCard';
 import { JobDialog } from './JobDialog';
-import { STATUSES, type Job, type JobInput, type Status } from './types';
+import { STATUSES, type Job, type JobInput, type Reminders, type Status } from './types';
 
 type DialogState = { open: false } | { open: true; job: Job | null; status: Status };
 
 export function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [reminders, setReminders] = useState<Reminders>({ days: 7, jobs: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<DialogState>({ open: false });
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Status | null>(null);
 
+  const syncReminders = useCallback(async () => {
+    setReminders(await listReminders());
+  }, []);
+
   const refresh = useCallback(async () => {
     try {
-      setJobs(await listJobs());
+      const [nextJobs] = await Promise.all([listJobs(), syncReminders()]);
+      setJobs(nextJobs);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load jobs');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [syncReminders]);
 
   useEffect(() => {
     void refresh();
@@ -45,6 +52,7 @@ export function App() {
       dialog.job ? prev.map((job) => (job.id === saved.id ? saved : job)) : [...prev, saved],
     );
     setDialog({ open: false });
+    void syncReminders();
   };
 
   const remove = async (job: Job) => {
@@ -52,6 +60,7 @@ export function App() {
     setJobs((prev) => prev.filter((item) => item.id !== job.id));
     try {
       await deleteJob(job.id);
+      void syncReminders();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete job');
       void refresh();
@@ -86,6 +95,13 @@ export function App() {
       </header>
 
       {error && <p className="banner error">{error}</p>}
+      {!loading && (
+        <DueSoon
+          jobs={reminders.jobs}
+          days={reminders.days}
+          onSelect={(job) => setDialog({ open: true, job, status: job.status })}
+        />
+      )}
       {loading ? (
         <p className="banner">Loading board…</p>
       ) : (

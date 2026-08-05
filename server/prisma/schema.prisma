@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Job {
-  id        String   @id @default(cuid())
-  company   String
-  role      String
-  link      String?
-  notes     String?
-  status    String   @default("Applied")
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String    @id @default(cuid())
+  company      String
+  role         String
+  link         String?
+  notes        String?
+  status       String    @default("Applied")
+  order        Int       @default(0)
+  followUpDate DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

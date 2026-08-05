@@ -99,6 +99,94 @@ button:active {
   border-color: rgba(255, 107, 129, 0.4);
 }
 
+.due-soon {
+  background: linear-gradient(180deg, var(--surface), rgba(30, 34, 54, 0.6));
+  border: 1px solid #3a4165;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.due-soon-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.due-soon-header h2 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+
+.due-soon-header .subtitle {
+  margin: 0;
+  flex-basis: 100%;
+}
+
+.due-soon-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.due-soon-item {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid #333a5e;
+  color: var(--text);
+  text-align: left;
+  padding: 8px 12px;
+}
+
+.due-soon-item:hover {
+  border-color: var(--accent);
+}
+
+.due-soon-company {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.due-soon-role {
+  color: var(--muted);
+  font-size: 13px;
+  flex: 1;
+}
+
+.due-soon-date {
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.due-soon-overdue {
+  border-color: rgba(255, 107, 129, 0.5);
+}
+
+.due-soon-overdue .due-soon-date {
+  color: var(--danger);
+}
+
+.follow-up {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.follow-up-overdue {
+  color: var(--danger);
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(5, minmax(240px, 1fr));

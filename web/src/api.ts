@@ -1,4 +1,4 @@
-import type { Job, JobInput, Status } from './types';
+import type { Job, JobInput, Reminders, Status } from './types';
 
 const BASE = '/api/jobs';
 
@@ -28,3 +28,6 @@ export const updateJob = (id: string, input: Partial<JobInput> & { status?: Stat
 
 export const deleteJob = (id: string) =>
   fetch(`${BASE}/${id}`, { method: 'DELETE' }).then((r) => handle<void>(r));
+
+export const listReminders = (days?: number) =>
+  fetch(days ? `/api/reminders?days=${days}` : '/api/reminders').then((r) => handle<Reminders>(r));

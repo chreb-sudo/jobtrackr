@@ -53,6 +53,17 @@ describe('POST /api/jobs', () => {
     const res = await request(app).post('/api/jobs').send({ ...sample, status: 'Ghosted' });
     expect(res.status).toBe(400);
   });
+
+  it('stores a follow-up date', async () => {
+    const res = await request(app).post('/api/jobs').send({ ...sample, followUpDate: '2026-02-15' });
+    expect(res.status).toBe(201);
+    expect(new Date(res.body.followUpDate).toISOString()).toBe('2026-02-15T00:00:00.000Z');
+  });
+
+  it('rejects an invalid follow-up date', async () => {
+    const res = await request(app).post('/api/jobs').send({ ...sample, followUpDate: 'someday' });
+    expect(res.status).toBe(400);
+  });
 });
 
 describe('GET /api/jobs', () => {
@@ -84,6 +95,14 @@ describe('PATCH /api/jobs/:id', () => {
     const { body: job } = await request(app).post('/api/jobs').send(sample);
     const res = await request(app).patch(`/api/jobs/${job.id}`).send({ link: '' });
     expect(res.body.link).toBeNull();
+  });
+
+  it('sets and clears the follow-up date', async () => {
+    const { body: job } = await request(app).post('/api/jobs').send(sample);
+    const set = await request(app).patch(`/api/jobs/${job.id}`).send({ followUpDate: '2026-03-01' });
+    expect(new Date(set.body.followUpDate).toISOString()).toBe('2026-03-01T00:00:00.000Z');
+    const cleared = await request(app).patch(`/api/jobs/${job.id}`).send({ followUpDate: '' });
+    expect(cleared.body.followUpDate).toBeNull();
   });
 
   it('404s for an unknown id', async () => {

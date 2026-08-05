@@ -12,6 +12,10 @@ A job-application tracker with a drag-and-drop Kanban board.
 Applications move through five stages: **Applied → Phone → Onsite → Offer → Rejected**. Cards are
 dragged between columns and every change is persisted through the API.
 
+Each application can carry an optional **follow-up date**. Applications that are overdue or due
+within the next few days surface in a **Due soon** section at the top of the board, backed by the
+`/api/reminders` endpoint.
+
 ## Getting started
 
 Requires Node.js 20+.
@@ -56,6 +60,7 @@ Base URL `http://localhost:4000`.
 | `POST` | `/api/jobs` | Create a job (`company` and `role` required) |
 | `PATCH` | `/api/jobs/:id` | Update any field; changing `status` moves the card and appends it to the target column |
 | `DELETE` | `/api/jobs/:id` | Delete a job |
+| `GET` | `/api/reminders` | Jobs with a follow-up date that is overdue or due within `days` (default `7`, e.g. `?days=30`), ordered by date |
 
 Job shape:
 
@@ -68,10 +73,14 @@ Job shape:
   "notes": "Referred by Dana",
   "status": "Phone",
   "order": 0,
+  "followUpDate": "2026-02-15T00:00:00.000Z",
   "createdAt": "2026-01-01T00:00:00.000Z",
   "updatedAt": "2026-01-01T00:00:00.000Z"
 }
 ```
+
+`followUpDate` accepts any parseable date string (the UI sends `YYYY-MM-DD`) and is cleared by
+sending an empty string. `/api/reminders` responds with `{ "days": <window>, "jobs": [...] }`.
 
 Invalid payloads return `400` with the Zod issues; unknown ids return `404`.
 

@@ -10,12 +10,21 @@ const createSchema = z.object({
   notes: z.string().trim().optional(),
   status: z.enum(STATUSES).optional(),
   order: z.number().int().optional(),
+  followUpDate: z
+    .string()
+    .trim()
+    .refine((value) => value === '' || !Number.isNaN(Date.parse(value)), {
+      message: 'Invalid follow-up date',
+    })
+    .optional(),
 });
 
 const updateSchema = createSchema.partial();
 
 const normalize = <T extends { link?: string }>(input: T) =>
   input.link === '' ? { ...input, link: null } : input;
+
+const followUpValue = (raw: string) => (raw === '' ? null : new Date(raw));
 
 export function jobsRouter(prisma: PrismaClient): Router {
   const router = Router();
@@ -30,9 +39,14 @@ export function jobsRouter(prisma: PrismaClient): Router {
     if (!parsed.success) {
       return res.status(400).json({ error: 'Invalid job payload', issues: parsed.error.issues });
     }
-    const count = await prisma.job.count({ where: { status: parsed.data.status ?? 'Applied' } });
+    const { followUpDate, ...rest } = parsed.data;
+    const count = await prisma.job.count({ where: { status: rest.status ?? 'Applied' } });
     const job = await prisma.job.create({
-      data: { order: count, ...normalize(parsed.data) },
+      data: {
+        order: count,
+        ...normalize(rest),
+        ...(followUpDate === undefined ? {} : { followUpDate: followUpValue(followUpDate) }),
+      },
     });
     res.status(201).json(job);
   });
@@ -45,14 +59,19 @@ export function jobsRouter(prisma: PrismaClient): Router {
     const existing = await prisma.job.findUnique({ where: { id: req.params.id } });
     if (!existing) return res.status(404).json({ error: 'Job not found' });
 
-    const movedColumn = parsed.data.status !== undefined && parsed.data.status !== existing.status;
+    const { followUpDate, ...rest } = parsed.data;
+    const movedColumn = rest.status !== undefined && rest.status !== existing.status;
     const order =
-      parsed.data.order ??
-      (movedColumn ? await prisma.job.count({ where: { status: parsed.data.status } }) : undefined);
+      rest.order ??
+      (movedColumn ? await prisma.job.count({ where: { status: rest.status } }) : undefined);
 
     const job = await prisma.job.update({
       where: { id: existing.id },
-      data: { ...normalize(parsed.data), ...(order === undefined ? {} : { order }) },
+      data: {
+        ...normalize(rest),
+        ...(followUpDate === undefined ? {} : { followUpDate: followUpValue(followUpDate) }),
+        ...(order === undefined ? {} : { order }),
+      },
     });
     res.json(job);
   });
